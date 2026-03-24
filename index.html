@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fet a la Llenya — Rostisseria Artesana</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ember:     #C0392B;
+      --ember-deep:#8B1A1A;
+      --oak:       #3B2410;
+      --bark:      #5C3317;
+      --smoke:     #EDE0CF;
+      --cream:     #FAF5EC;
+      --ash:       #9E8A76;
+      --gold:      #D4A017;
+      --char:      #1A0F08;
+    }
+ 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    html { scroll-behavior: smooth; }
+ 
+    body {
+      background: var(--cream);
+      color: var(--oak);
+      font-family: 'Raleway', sans-serif;
+      overflow-x: hidden;
+    }
+ 
+    /* ─── NOISE TEXTURE ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: .5;
+    }
+ 
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: linear-gradient(to bottom, rgba(26,15,8,.85) 0%, transparent 100%);
+      transition: background .4s;
+    }
+    nav.scrolled {
+      background: rgba(26,15,8,.97);
+      box-shadow: 0 2px 20px rgba(0,0,0,.3);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900; font-style: italic;
+      color: var(--smoke);
+      letter-spacing: .02em;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-size: .75rem; font-weight: 600; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--smoke);
+      text-decoration: none; opacity: .75;
+      transition: opacity .2s, color .2s;
+      position: relative; padding-bottom: 2px;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 1px; background: var(--gold);
+      transition: width .3s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+    .nav-links a:hover::after { width: 100%; }
+    .lang-switcher {
+      display: flex; gap: .6rem;
+    }
+    .lang-switcher button {
+      background: none; border: 1px solid rgba(250,245,236,.25);
+      color: var(--smoke); font-family: 'Raleway', sans-serif;
+      font-size: .65rem; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; padding: .3rem .6rem;
+      cursor: pointer; transition: all .2s; border-radius: 2px;
+    }
+    .lang-switcher button:hover,
+    .lang-switcher button.active { background: var(--gold); border-color: var(--gold); color: var(--oak); }
+ 
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh; position: relative;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 50% 110%, rgba(192,57,43,.45) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 30% 60%, rgba(212,160,23,.12) 0%, transparent 60%),
+        linear-gradient(175deg, #1A0F08 0%, #2E1A0E 40%, #3B2410 100%);
+    }
+    /* Animated ember particles */
+    .embers {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    }
+    .ember {
+      position: absolute; bottom: -10px;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: rise var(--dur, 6s) var(--delay, 0s) infinite ease-out;
+      opacity: 0;
+    }
+    @keyframes rise {
+      0%   { transform: translateY(0) translateX(0) scale(1); opacity: .9; }
+      50%  { transform: translateY(-45vh) translateX(var(--drift, 30px)) scale(.6); opacity: .5; }
+      100% { transform: translateY(-90vh) translateX(calc(var(--drift, 30px)*1.5)) scale(.1); opacity: 0; }
+    }
+ 
+    .hero-content {
+      position: relative; z-index: 2;
+      text-align: center; padding: 2rem;
+      animation: heroIn 1.2s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes heroIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-eyebrow {
+      font-size: .7rem; font-weight: 600; letter-spacing: .35em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.2rem;
+      animation: heroIn 1s .2s both;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(4rem, 12vw, 9rem);
+      font-weight: 900; font-style: italic;
+      line-height: .9;
+      color: var(--smoke);
+      text-shadow: 0 4px 40px rgba(192,57,43,.5);
+      animation: heroIn 1s .35s both;
+    }
+    .hero-title em {
+      display: block;
+      color: var(--gold);
+      font-style: normal;
+    }
+    .hero-sub {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(.95rem, 2.5vw, 1.25rem);
+      font-style: italic;
+      color: rgba(237,224,207,.65);
+      margin-top: 1.5rem;
+      letter-spacing: .04em;
+      animation: heroIn 1s .5s both;
+    }
+    .hero-divider {
+      margin: 2rem auto;
+      width: 60px; height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      animation: heroIn 1s .65s both;
+    }
+    .hero-cta {
+      display: inline-flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+      animation: heroIn 1s .8s both;
+    }
+    .btn {
+      font-family: 'Raleway', sans-serif;
+      font-size: .72rem; font-weight: 700; letter-spacing: .2em;
+      text-transform: uppercase; text-decoration: none;
+      padding: 1rem 2.4rem; border-radius: 2px;
+      transition: all .25s; cursor: pointer; border: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background: var(--ember); color: var(--smoke);
+      box-shadow: 0 4px 24px rgba(192,57,43,.4);
+    }
+    .btn-primary:hover {
+      background: var(--ember-deep);
+      box-shadow: 0 6px 32px rgba(192,57,43,.6);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(237,224,207,.4);
+      color: var(--smoke);
+    }
+    .btn-outline:hover {
+      border-color: var(--gold); color: var(--gold);
+      transform: translateY(-2px);
+    }
+ 
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: .5rem; color: rgba(237,224,207,.4);
+      font-size: .6rem; font-weight: 600; letter-spacing: .2em;
+      text-transform: uppercase;
+      animation: heroIn 1s 1.2s both;
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, rgba(237,224,207,.4), transparent);
+      animation: scrollPulse 2s infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: .4; } 50% { opacity: 1; }
+    }
+ 
+    /* ─── PILLARS / VALUES ─── */
+    .pillars {
+      background: var(--oak);
+      padding: 5rem 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2px;
+    }
+    .pillar {
+      background: var(--bark);
+      padding: 3rem 2rem;
+      text-align: center;
+      transition: background .3s;
+    }
+    .pillar:hover { background: #6B3D1F; }
+    .pillar-icon {
+      font-size: 2.5rem; margin-bottom: 1rem;
+      display: block;
+    }
+    .pillar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--smoke); margin-bottom: .5rem;
+    }
+    .pillar-text {
+      font-size: .8rem; line-height: 1.6;
+      color: var(--ash); font-weight: 400;
+    }
+ 
+    /* ─── SPECIALITY SECTION ─── */
+    .specialty {
+      padding: 8rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .specialty-visual {
+      position: relative;
+    }
+    .specialty-img-wrap {
+      width: 100%; aspect-ratio: 4/5;
+      background: linear-gradient(135deg, var(--bark) 0%, var(--oak) 100%);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 24px 24px 0 var(--smoke), 26px 26px 0 var(--ash);
+    }
+    .specialty-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: .85; mix-blend-mode: multiply;
+    }
+    .specialty-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem;
+      color: var(--ash);
+    }
+    .specialty-img-placeholder span { font-size: 4rem; }
+    .specialty-img-placeholder p {
+      font-size: .75rem; letter-spacing: .1em;
+      text-transform: uppercase; font-weight: 600;
+    }
+    .specialty-badge {
+      position: absolute; bottom: -1.5rem; right: -1.5rem;
+      width: 100px; height: 100px;
+      background: var(--ember); border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      color: var(--smoke); text-align: center;
+      font-size: .65rem; font-weight: 700;
+      letter-spacing: .05em; text-transform: uppercase;
+      line-height: 1.3;
+      box-shadow: 0 4px 20px rgba(192,57,43,.5);
+      animation: rotateBadge 20s linear infinite;
+    }
+    @keyframes rotateBadge {
+      from { transform: rotate(0deg); } to { transform: rotate(360deg); }
+    }
+    .badge-inner { animation: rotateBadge 20s linear infinite reverse; }
+ 
+    .specialty-text .eyebrow {
+      font-size: .7rem; font-weight: 600; letter-spacing: .3em;
+      text-transform: uppercase; color: var(--ember);
+      margin-bottom: 1rem;
+    }
+    .specialty-text h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900; line-height: 1.05;
+      color: var(--oak); margin-bottom: 1.5rem;
+    }
+    .specialty-text h2 em {
+      font-style: italic; color: var(--ember);
+    }
+    .specialty-text p {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1rem; line-height: 1.8;
+      color: var(--bark); margin-bottom: 1rem;
+    }
+    .specialty-text .stat-row {
+      display: flex; gap: 2.5rem; margin: 2rem 0;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem; font-weight: 900;
+      color: var(--ember); line-height: 1;
+    }
+    .stat-label {
+      font-size: .65rem; font-weight: 600; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--ash);
+      margin-top: .3rem;
+    }
+ 
+    /* ─── MENU PREVIEW ─── */
+    .menu-section {
+      background: var(--char);
+      padding: 7rem 4rem;
+      position: relative; overflow: hidden;
+    }
+    .menu-section::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(to right, transparent, var(--gold), var(--ember), transparent);
+    }
+    .section-header {
+      text-align: center; margin-bottom: 4rem;
+    }
+    .section-eyebrow {
+      font-size: .7rem; font-weight: 600; letter-spacing: .3em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: .8rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900; color: var(--smoke);
+      margin-bottom: .5rem;
+    }
+    .section-sub {
+      font-family: 'Libre Baskerville', serif;
+      font-style: italic; color: var(--ash);
+      font-size: .95rem;
+    }
+ 
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px; margin: 0 auto 3rem;
+    }
+    .menu-card {
+      background: var(--bark);
+      border-radius: 4px; overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .menu-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.5);
+    }
+    .menu-card-img {
+      width: 100%; aspect-ratio: 4/3;
+      background: linear-gradient(135deg, #3B2410, #5C3317);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-card-img::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(26,15,8,.8) 0%, transparent 50%);
+    }
+    .menu-card-img img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .card-tag {
+      position: absolute; top: 1rem; left: 1rem; z-index: 2;
+      background: var(--ember); color: var(--smoke);
+      font-size: .6rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; padding: .3rem .7rem;
+      border-radius: 2px;
+    }
+    .menu-card-body {
+      padding: 1.5rem;
+    }
+    .menu-card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--smoke); margin-bottom: .4rem;
+    }
+    .menu-card-desc {
+      font-size: .8rem; line-height: 1.6; color: var(--ash);
+      margin-bottom: 1.2rem;
+    }
+    .menu-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .menu-card-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900; color: var(--gold);
+    }
+    .menu-card-link {
+      font-size: .65rem; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--ember);
+      text-decoration: none;
+      display: flex; align-items: center; gap: .3rem;
+      transition: gap .2s;
+    }
+    .menu-card-link:hover { gap: .6rem; }
+ 
+    .menu-cta { text-align: center; margin-top: 1rem; }
+ 
+    /* ─── HOW IT WORKS ─── */
+    .how {
+      padding: 7rem 4rem;
+      background: var(--smoke);
+    }
+    .how-steps {
+      display: flex;
+      max-width: 1000px; margin: 4rem auto 0;
+      position: relative;
+    }
+    .how-steps::before {
+      content: '';
+      position: absolute; top: 2rem; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(to right, var(--ash), var(--ember), var(--ash));
+    }
+    .step {
+      flex: 1; text-align: center; padding: 0 1.5rem;
+      position: relative;
+    }
+    .step-num {
+      width: 4rem; height: 4rem; border-radius: 50%;
+      background: var(--cream); border: 2px solid var(--ash);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900; color: var(--ember);
+      position: relative; z-index: 1;
+      transition: all .3s;
+    }
+    .step:hover .step-num {
+      background: var(--ember); border-color: var(--ember);
+      color: var(--smoke);
+      transform: scale(1.1);
+    }
+    .step-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--oak); margin-bottom: .5rem;
+    }
+    .step-text { font-size: .8rem; line-height: 1.6; color: var(--bark); }
+ 
+    /* ─── CONTACT / INFO ─── */
+    .contact {
+      background: var(--oak);
+      padding: 6rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .contact-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 900; font-style: italic;
+      color: var(--smoke); margin-bottom: 2rem;
+    }
+    .info-item {
+      display: flex; gap: 1rem; margin-bottom: 1.5rem;
+      align-items: flex-start;
+    }
+    .info-icon { font-size: 1.2rem; margin-top: .1rem; }
+    .info-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: .2rem;
+    }
+    .info-value { font-size: .9rem; color: var(--smoke); line-height: 1.5; }
+ 
+    .contact-hours h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--smoke); margin-bottom: 1.5rem;
+    }
+    .hours-row {
+      display: flex; justify-content: space-between;
+      padding: .6rem 0;
+      border-bottom: 1px solid rgba(237,224,207,.1);
+      font-size: .85rem;
+    }
+    .hours-day { color: var(--ash); font-weight: 600; }
+    .hours-time { color: var(--smoke); }
+    .hours-time.closed { color: var(--ember); font-style: italic; }
+ 
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--char);
+      text-align: center;
+      padding: 2.5rem 4rem;
+      border-top: 1px solid rgba(237,224,207,.08);
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 900; font-style: italic;
+      color: var(--smoke); margin-bottom: .8rem;
+    }
+    .footer-logo span { color: var(--gold); }
+    .footer-tagline {
+      font-size: .72rem; font-weight: 500; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--ash);
+      margin-bottom: 1.5rem;
+    }
+    .footer-copy {
+      font-size: .72rem; color: rgba(158,138,118,.5);
+    }
+ 
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .specialty { grid-template-columns: 1fr; gap: 3rem; padding: 4rem 2rem; }
+      .contact { grid-template-columns: 1fr; gap: 3rem; padding: 4rem 2rem; }
+      .how { padding: 5rem 2rem; }
+      .how-steps { flex-direction: column; gap: 2rem; }
+      .how-steps::before { display: none; }
+      .pillars { padding: 3rem 1rem; }
+      .menu-section { padding: 5rem 1.5rem; }
+    }
+    @media (max-width: 600px) {
+      .hero-title { font-size: clamp(3rem, 15vw, 5rem); }
+      .specialty-text .stat-row { gap: 1.5rem; }
+    }
+ 
+    /* ─── LANG TOGGLE ─── */
+    [data-lang] { display: none; }
+    .lang-ca [data-lang="ca"],
+    .lang-es [data-lang="es"],
+    .lang-en [data-lang="en"] { display: inherit; }
+    .lang-ca .nav-links [data-lang="ca"],
+    .lang-es .nav-links [data-lang="es"],
+    .lang-en .nav-links [data-lang="en"] { display: flex; }
+  </style>
+</head>
+<body class="lang-ca">
+ 
+<!-- ─── NAV ─── -->
+<nav id="main-nav">
+  <a href="#" class="nav-logo">Fet a la <span>Llenya</span></a>
+ 
+  <ul class="nav-links">
+    <!-- CA -->
+    <li data-lang="ca"><a href="#especialitat">L'Especialitat</a></li>
+    <li data-lang="ca"><a href="carta.html">La Carta</a></li>
+    <li data-lang="ca"><a href="#horaris">Horaris</a></li>
+    <li data-lang="ca"><a href="#contacte">Contacte</a></li>
+    <!-- ES -->
+    <li data-lang="es"><a href="#especialitat">La Especialidad</a></li>
+    <li data-lang="es"><a href="carta.html">La Carta</a></li>
+    <li data-lang="es"><a href="#horaris">Horarios</a></li>
+    <li data-lang="es"><a href="#contacte">Contacto</a></li>
+    <!-- EN -->
+    <li data-lang="en"><a href="#especialitat">Our Specialty</a></li>
+    <li data-lang="en"><a href="carta.html">Menu</a></li>
+    <li data-lang="en"><a href="#horaris">Hours</a></li>
+    <li data-lang="en"><a href="#contacte">Contact</a></li>
+  </ul>
+ 
+  <div class="lang-switcher">
+    <button onclick="setLang('ca')" data-lbtn="ca">CA</button>
+    <button onclick="setLang('es')" data-lbtn="es">ES</button>
+    <button onclick="setLang('en')" data-lbtn="en">EN</button>
+  </div>
+</nav>
+ 
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="embers" id="embers"></div>
+ 
+  <div class="hero-content">
+    <p class="hero-eyebrow">
+      <span data-lang="ca">🔥 Rostisseria Artesana · Barcelona</span>
+      <span data-lang="es">🔥 Rostissería Artesana · Barcelona</span>
+      <span data-lang="en">🔥 Artisan Rotisserie · Barcelona</span>
+    </p>
+ 
+    <h1 class="hero-title">
+      Fet a la
+      <em>Llenya</em>
+    </h1>
+ 
+    <p class="hero-sub">
+      <span data-lang="ca">Cuina casolana. Foc de veritat. Sabor honest.</span>
+      <span data-lang="es">Cocina casera. Fuego de verdad. Sabor honesto.</span>
+      <span data-lang="en">Home cooking. Real fire. Honest flavour.</span>
+    </p>
+    <div class="hero-divider"></div>
+ 
+    <div class="hero-cta">
+      <a href="carta.html" class="btn btn-primary">
+        <span data-lang="ca">Veure la carta</span>
+        <span data-lang="es">Ver la carta</span>
+        <span data-lang="en">View the menu</span>
+      </a>
+      <a href="#contacte" class="btn btn-outline">
+        <span data-lang="ca">Com arribar</span>
+        <span data-lang="es">Cómo llegar</span>
+        <span data-lang="en">Find us</span>
+      </a>
+    </div>
+  </div>
+ 
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span data-lang="ca">Descobreix</span>
+    <span data-lang="es">Descubre</span>
+    <span data-lang="en">Explore</span>
+  </div>
+</section>
+ 
+<!-- ─── PILLARS ─── -->
+<section class="pillars">
+  <div class="pillar">
+    <span class="pillar-icon">🌿</span>
+    <div class="pillar-title">
+      <span data-lang="ca">Ecològic</span>
+      <span data-lang="es">Ecológico</span>
+      <span data-lang="en">Organic</span>
+    </div>
+    <p class="pillar-text">
+      <span data-lang="ca">Productes ecològics i de proximitat, sense pesticides ni químics.</span>
+      <span data-lang="es">Productos ecológicos y de proximidad, sin pesticidas ni químicos.</span>
+      <span data-lang="en">Organic and local produce, free from pesticides and chemicals.</span>
+    </p>
+  </div>
+  <div class="pillar">
+    <span class="pillar-icon">🔥</span>
+    <div class="pillar-title">
+      <span data-lang="ca">Llenya</span>
+      <span data-lang="es">Leña</span>
+      <span data-lang="en">Wood fire</span>
+    </div>
+    <p class="pillar-text">
+      <span data-lang="ca">Cuinat a foc lent amb llenya. El sabor que les màquines no poden reproduir.</span>
+      <span data-lang="es">Cocinado a fuego lento con leña. El sabor que las máquinas no pueden reproducir.</span>
+      <span data-lang="en">Slow-cooked over wood fire. The flavour no machine can replicate.</span>
+    </p>
+  </div>
+  <div class="pillar">
+    <span class="pillar-icon">🏠</span>
+    <div class="pillar-title">
+      <span data-lang="ca">Casolà</span>
+      <span data-lang="es">Casero</span>
+      <span data-lang="en">Home-made</span>
+    </div>
+    <p class="pillar-text">
+      <span data-lang="ca">Receptes de tota la vida. Sense additius. Fet avui, per a avui.</span>
+      <span data-lang="es">Recetas de toda la vida. Sin aditivos. Hecho hoy, para hoy.</span>
+      <span data-lang="en">Traditional recipes. No additives. Made today, for today.</span>
+    </p>
+  </div>
+  <div class="pillar">
+    <span class="pillar-icon">🛍️</span>
+    <div class="pillar-title">
+      <span data-lang="ca">Per emportar</span>
+      <span data-lang="es">Para llevar</span>
+      <span data-lang="en">Takeaway</span>
+    </div>
+    <p class="pillar-text">
+      <span data-lang="ca">Menja de restaurant a casa teva, calenta i recèntment feta.</span>
+      <span data-lang="es">Comida de restaurante en tu casa, caliente y recién hecha.</span>
+      <span data-lang="en">Restaurant quality food at home, hot and freshly made.</span>
+    </p>
+  </div>
+</section>
+ 
+<!-- ─── SPECIALTY ─── -->
+<section class="specialty" id="especialitat">
+  <div class="specialty-visual">
+    <div class="specialty-img-wrap">
+      <div class="specialty-img-placeholder">
+        <span>🍗</span>
+        <p>
+          <span data-lang="ca">Foto del pollastre a la llenya</span>
+          <span data-lang="es">Foto del pollo a la leña</span>
+          <span data-lang="en">Wood-fired chicken photo</span>
+        </p>
+      </div>
+    </div>
+    <div class="specialty-badge">
+      <div class="badge-inner">
+        <div>L'ESTRELLA</div>
+        <div style="font-size:1.3rem">🔥</div>
+        <div>DE LA CARTA</div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="specialty-text">
+    <p class="eyebrow">
+      <span data-lang="ca">La nostra especialitat</span>
+      <span data-lang="es">Nuestra especialidad</span>
+      <span data-lang="en">Our specialty</span>
+    </p>
+    <h2>
+      <span data-lang="ca">Pollastre<br/><em>a la Llenya</em></span>
+      <span data-lang="es">Pollo<br/><em>a la Leña</em></span>
+      <span data-lang="en">Wood-fired<br/><em>Chicken</em></span>
+    </h2>
+    <p>
+      <span data-lang="ca">El pollastre de pagès, criat en llibertat, cuinat amb llenya d'alzina durant hores. La pell cruixent, la carn sucosa. Sense més secrets que el foc i la paciència.</span>
+      <span data-lang="es">El pollo de granja, criado en libertad, cocinado con leña de encina durante horas. La piel crujiente, la carne jugosa. Sin más secretos que el fuego y la paciencia.</span>
+      <span data-lang="en">Free-range farm chicken, cooked over holm oak wood for hours. Crispy skin, juicy meat. No secrets beyond fire and patience.</span>
+    </p>
+    <p>
+      <span data-lang="ca">Acompanyat de patates rústiques al forn i allioli de la casa. Una combinació que porta dècades sent l'orgull del barri.</span>
+      <span data-lang="es">Acompañado de patatas rústicas al horno y alioli de la casa. Una combinación que lleva décadas siendo el orgullo del barrio.</span>
+      <span data-lang="en">Served with rustic oven potatoes and house-made aioli. A combination that has been the neighbourhood's pride for decades.</span>
+    </p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-num">+20</div>
+        <div class="stat-label">
+          <span data-lang="ca">Anys de foc</span>
+          <span data-lang="es">Años de fuego</span>
+          <span data-lang="en">Years of fire</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">
+          <span data-lang="ca">Ecològic</span>
+          <span data-lang="es">Ecológico</span>
+          <span data-lang="en">Organic</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">
+          <span data-lang="ca">Additius</span>
+          <span data-lang="es">Aditivos</span>
+          <span data-lang="en">Additives</span>
+        </div>
+      </div>
+    </div>
+    <a href="carta.html" class="btn btn-primary">
+      <span data-lang="ca">Veure tots els plats</span>
+      <span data-lang="es">Ver todos los platos</span>
+      <span data-lang="en">See all dishes</span>
+    </a>
+  </div>
+</section>
+ 
+<!-- ─── MENU PREVIEW ─── -->
+<section class="menu-section" id="carta">
+  <div class="section-header">
+    <p class="section-eyebrow">
+      <span data-lang="ca">Cuina de mercat</span>
+      <span data-lang="es">Cocina de mercado</span>
+      <span data-lang="en">Market cuisine</span>
+    </p>
+    <h2 class="section-title">
+      <span data-lang="ca">El menú del dia</span>
+      <span data-lang="es">El menú del día</span>
+      <span data-lang="en">Today's menu</span>
+    </h2>
+    <p class="section-sub">
+      <span data-lang="ca">Cada dia, plats nous. Sempre frescos, sempre naturals.</span>
+      <span data-lang="es">Cada día, platos nuevos. Siempre frescos, siempre naturales.</span>
+      <span data-lang="en">Every day, new dishes. Always fresh, always natural.</span>
+    </p>
+  </div>
+ 
+  <div class="menu-grid">
+    <div class="menu-card" onclick="window.location='plat.html'">
+      <div class="menu-card-img">
+        🍗
+        <span class="card-tag">
+          <span data-lang="ca">Especialitat</span>
+          <span data-lang="es">Especialidad</span>
+          <span data-lang="en">Specialty</span>
+        </span>
+      </div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">
+          <span data-lang="ca">Pollastre a la Llenya</span>
+          <span data-lang="es">Pollo a la Leña</span>
+          <span data-lang="en">Wood-fired Chicken</span>
+        </div>
+        <p class="menu-card-desc">
+          <span data-lang="ca">Pollastre de pagès ecològic, cuit a foc lent. Patates i allioli inclosos.</span>
+          <span data-lang="es">Pollo de granja ecológico, cocido a fuego lento. Patatas y alioli incluidos.</span>
+          <span data-lang="en">Organic free-range chicken, slow cooked. Potatoes and aioli included.</span>
+        </p>
+        <div class="menu-card-footer">
+          <div class="menu-card-price">11,50€</div>
+          <a href="plat.html" class="menu-card-link">
+            <span data-lang="ca">Veure plat</span>
+            <span data-lang="es">Ver plato</span>
+            <span data-lang="en">View dish</span>
+            →
+          </a>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="menu-card">
+      <div class="menu-card-img">🥩</div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">
+          <span data-lang="ca">Costelles a la brasa</span>
+          <span data-lang="es">Costillas a la brasa</span>
+          <span data-lang="en">Chargrilled ribs</span>
+        </div>
+        <p class="menu-card-desc">
+          <span data-lang="ca">Costelles de porc ecòlogic marinades 24h. Acompanyades de verdures de temporada.</span>
+          <span data-lang="es">Costillas de cerdo ecológico marinadas 24h. Acompañadas de verduras de temporada.</span>
+          <span data-lang="en">Organic pork ribs marinated 24h. Served with seasonal vegetables.</span>
+        </p>
+        <div class="menu-card-footer">
+          <div class="menu-card-price">13,90€</div>
+          <a href="plat.html" class="menu-card-link">
+            <span data-lang="ca">Veure plat</span>
+            <span data-lang="es">Ver plato</span>
+            <span data-lang="en">View dish</span>
+            →
+          </a>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="menu-card">
+      <div class="menu-card-img">🫘</div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">
+          <span data-lang="ca">Escudella i carn d'olla</span>
+          <span data-lang="es">Escudella y carne de olla</span>
+          <span data-lang="en">Traditional Catalan stew</span>
+        </div>
+        <p class="menu-card-desc">
+          <span data-lang="ca">El plat de l'àvia, fet amb verdures i carns ecològiques. Disponible dijous.</span>
+          <span data-lang="es">El plato de la abuela, hecho con verduras y carnes ecológicas. Disponible jueves.</span>
+          <span data-lang="en">Grandma's recipe, made with organic vegetables and meat. Available Thursdays.</span>
+        </p>
+        <div class="menu-card-footer">
+          <div class="menu-card-price">9,50€</div>
+          <a href="plat.html" class="menu-card-link">
+            <span data-lang="ca">Veure plat</span>
+            <span data-lang="es">Ver plato</span>
+            <span data-lang="en">View dish</span>
+            →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="menu-cta">
+    <a href="carta.html" class="btn btn-outline" style="color:var(--smoke); border-color:rgba(237,224,207,.3)">
+      <span data-lang="ca">Veure la carta completa</span>
+      <span data-lang="es">Ver la carta completa</span>
+      <span data-lang="en">See the full menu</span>
+    </a>
+  </div>
+</section>
+ 
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how" id="horaris">
+  <div class="section-header" style="max-width:1200px;margin:0 auto 0;">
+    <p class="section-eyebrow" style="color:var(--ember)">
+      <span data-lang="ca">Com funciona</span>
+      <span data-lang="es">Cómo funciona</span>
+      <span data-lang="en">How it works</span>
+    </p>
+    <h2 class="section-title" style="color:var(--oak)">
+      <span data-lang="ca">Simple i ràpid</span>
+      <span data-lang="es">Simple y rápido</span>
+      <span data-lang="en">Simple and fast</span>
+    </h2>
+  </div>
+  <div class="how-steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">
+        <span data-lang="ca">Tria el plat</span>
+        <span data-lang="es">Elige el plato</span>
+        <span data-lang="en">Choose your dish</span>
+      </div>
+      <p class="step-text">
+        <span data-lang="ca">Consulta la carta i tria allò que t'apeteix avui.</span>
+        <span data-lang="es">Consulta la carta y elige lo que te apetece hoy.</span>
+        <span data-lang="en">Browse the menu and pick what you fancy today.</span>
+      </p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">
+        <span data-lang="ca">Truca o passa</span>
+        <span data-lang="es">Llama o pasa</span>
+        <span data-lang="en">Call or walk in</span>
+      </div>
+      <p class="step-text">
+        <span data-lang="ca">Truca'ns per reservar la teva comanda o passa directament pel local.</span>
+        <span data-lang="es">Llámanos para reservar tu pedido o pasa directamente por el local.</span>
+        <span data-lang="en">Call us to reserve your order or just walk in to the shop.</span>
+      </p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">
+        <span data-lang="ca">Emporta-te'l calent</span>
+        <span data-lang="es">Llévalo caliente</span>
+        <span data-lang="en">Take it home hot</span>
+      </div>
+      <p class="step-text">
+        <span data-lang="ca">Recull la teva comanda recèntment feta i gaudeix a casa.</span>
+        <span data-lang="es">Recoge tu pedido recién hecho y disfruta en casa.</span>
+        <span data-lang="en">Pick up your freshly made order and enjoy it at home.</span>
+      </p>
+    </div>
+  </div>
+</section>
+ 
+<!-- ─── CONTACT ─── -->
+<div style="background:var(--oak)">
+<div class="contact" id="contacte">
+  <div class="contact-info">
+    <h3>
+      <span data-lang="ca">On som</span>
+      <span data-lang="es">Dónde estamos</span>
+      <span data-lang="en">Find us</span>
+    </h3>
+    <div class="info-item">
+      <span class="info-icon">📍</span>
+      <div>
+        <div class="info-label">
+          <span data-lang="ca">Adreça</span>
+          <span data-lang="es">Dirección</span>
+          <span data-lang="en">Address</span>
+        </div>
+        <div class="info-value">Carrer _________, __<br/>Barcelona</div>
+      </div>
+    </div>
+    <div class="info-item">
+      <span class="info-icon">📞</span>
+      <div>
+        <div class="info-label">
+          <span data-lang="ca">Telèfon</span>
+          <span data-lang="es">Teléfono</span>
+          <span data-lang="en">Phone</span>
+        </div>
+        <div class="info-value">+34 ___ ___ ___</div>
+      </div>
+    </div>
+    <div class="info-item">
+      <span class="info-icon">📱</span>
+      <div>
+        <div class="info-label">WhatsApp</div>
+        <div class="info-value">
+          <span data-lang="ca">Comandes per WhatsApp</span>
+          <span data-lang="es">Pedidos por WhatsApp</span>
+          <span data-lang="en">Orders via WhatsApp</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-item">
+      <span class="info-icon">🅿️</span>
+      <div>
+        <div class="info-label">
+          <span data-lang="ca">Aparcament</span>
+          <span data-lang="es">Aparcamiento</span>
+          <span data-lang="en">Parking</span>
+        </div>
+        <div class="info-value">
+          <span data-lang="ca">Zona blava al carrer</span>
+          <span data-lang="es">Zona azul en la calle</span>
+          <span data-lang="en">Blue zone street parking</span>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="contact-hours">
+    <h4>
+      <span data-lang="ca">Horaris</span>
+      <span data-lang="es">Horarios</span>
+      <span data-lang="en">Opening hours</span>
+    </h4>
+    <div class="hours-row">
+      <span class="hours-day">
+        <span data-lang="ca">Dilluns – Divendres</span>
+        <span data-lang="es">Lunes – Viernes</span>
+        <span data-lang="en">Monday – Friday</span>
+      </span>
+      <span class="hours-time">10:00 – 14:30 / 18:00 – 21:00</span>
+    </div>
+    <div class="hours-row">
+      <span class="hours-day">
+        <span data-lang="ca">Dissabte</span>
+        <span data-lang="es">Sábado</span>
+        <span data-lang="en">Saturday</span>
+      </span>
+      <span class="hours-time">10:00 – 15:00</span>
+    </div>
+    <div class="hours-row">
+      <span class="hours-day">
+        <span data-lang="ca">Diumenge</span>
+        <span data-lang="es">Domingo</span>
+        <span data-lang="en">Sunday</span>
+      </span>
+      <span class="hours-time closed">
+        <span data-lang="ca">Tancat</span>
+        <span data-lang="es">Cerrado</span>
+        <span data-lang="en">Closed</span>
+      </span>
+    </div>
+    <br/>
+    <p style="font-size:.8rem;color:var(--ash);font-style:italic;line-height:1.6">
+      <span data-lang="ca">* Recomanem trucar o escriure per WhatsApp per assegurar disponibilitat dels plats.</span>
+      <span data-lang="es">* Recomendamos llamar o escribir por WhatsApp para asegurar disponibilidad de los platos.</span>
+      <span data-lang="en">* We recommend calling or WhatsApping to ensure dish availability.</span>
+    </p>
+  </div>
+</div>
+</div>
+ 
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-logo">Fet a la <span>Llenya</span></div>
+  <div class="footer-tagline">
+    <span data-lang="ca">Rostisseria Artesana · Barcelona · Des de 200X</span>
+    <span data-lang="es">Rostissería Artesana · Barcelona · Desde 200X</span>
+    <span data-lang="en">Artisan Rotisserie · Barcelona · Since 200X</span>
+  </div>
+  <div class="footer-copy">© 2025 Fet a la Llenya. 
+    <span data-lang="ca">Tots els drets reservats.</span>
+    <span data-lang="es">Todos los derechos reservados.</span>
+    <span data-lang="en">All rights reserved.</span>
+  </div>
+</footer>
+ 
+<script>
+  // ── Ember particles ──
+  const container = document.getElementById('embers');
+  const drifts = [-60,-40,-20,0,20,40,60];
+  for (let i = 0; i < 28; i++) {
+    const e = document.createElement('div');
+    e.className = 'ember';
+    e.style.cssText = `
+      left: ${Math.random()*100}%;
+      --dur: ${4 + Math.random()*5}s;
+      --delay: ${Math.random()*6}s;
+      --drift: ${drifts[Math.floor(Math.random()*drifts.length)]}px;
+      width: ${1.5 + Math.random()*3}px;
+      height: ${1.5 + Math.random()*3}px;
+      background: ${Math.random() > .5 ? '#D4A017' : '#C0392B'};
+    `;
+    container.appendChild(e);
+  }
+ 
+  // ── Nav scroll ──
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 80);
+  });
+ 
+  // ── Language switcher ──
+  function setLang(lang) {
+    document.body.className = 'lang-' + lang;
+    document.querySelectorAll('[data-lbtn]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lbtn === lang);
+    });
+    document.documentElement.lang = lang;
+  }
+  // Set default active button
+  document.querySelector('[data-lbtn="ca"]').classList.add('active');
+</script>
+</body>
+</html>

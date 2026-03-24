@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Carta — Fet a la Llenya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ember:     #C0392B;
+      --ember-deep:#8B1A1A;
+      --oak:       #3B2410;
+      --bark:      #5C3317;
+      --smoke:     #EDE0CF;
+      --cream:     #FAF5EC;
+      --ash:       #9E8A76;
+      --gold:      #D4A017;
+      --char:      #1A0F08;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--cream);
+      color: var(--oak);
+      font-family: 'Raleway', sans-serif;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: .5;
+    }
+ 
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(26,15,8,.97);
+      box-shadow: 0 2px 20px rgba(0,0,0,.3);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900; font-style: italic;
+      color: var(--smoke); text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-size: .75rem; font-weight: 600; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--smoke);
+      text-decoration: none; opacity: .75;
+      transition: opacity .2s, color .2s;
+      position: relative; padding-bottom: 2px;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 1px; background: var(--gold);
+      transition: width .3s;
+    }
+    .nav-links a:hover, .nav-links a.active { opacity: 1; color: var(--gold); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+    .lang-switcher { display: flex; gap: .6rem; }
+    .lang-switcher button {
+      background: none; border: 1px solid rgba(250,245,236,.25);
+      color: var(--smoke); font-family: 'Raleway', sans-serif;
+      font-size: .65rem; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; padding: .3rem .6rem;
+      cursor: pointer; transition: all .2s; border-radius: 2px;
+    }
+    .lang-switcher button:hover,
+    .lang-switcher button.active { background: var(--gold); border-color: var(--gold); color: var(--oak); }
+ 
+    /* ─── PAGE HEADER ─── */
+    .page-header {
+      padding: 8rem 4rem 4rem;
+      background: linear-gradient(175deg, var(--char) 0%, var(--oak) 100%);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .page-header::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(to right, transparent, var(--gold), var(--ember), transparent);
+    }
+    .page-header-eyebrow {
+      font-size: .7rem; font-weight: 600; letter-spacing: .35em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 1rem;
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 900; font-style: italic;
+      color: var(--smoke); line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .page-header p {
+      font-family: 'Libre Baskerville', serif;
+      font-style: italic; color: var(--ash); font-size: .95rem;
+    }
+ 
+    /* ─── STICKY CATEGORY NAV ─── */
+    .cat-nav {
+      position: sticky; top: 64px; z-index: 400;
+      background: var(--oak);
+      padding: .8rem 4rem;
+      display: flex; gap: .5rem; flex-wrap: wrap;
+      border-bottom: 1px solid rgba(237,224,207,.1);
+      overflow-x: auto;
+    }
+    .cat-nav::-webkit-scrollbar { height: 3px; }
+    .cat-nav::-webkit-scrollbar-track { background: var(--bark); }
+    .cat-nav::-webkit-scrollbar-thumb { background: var(--gold); }
+    .cat-btn {
+      background: none; border: 1px solid rgba(237,224,207,.2);
+      color: var(--smoke); font-family: 'Raleway', sans-serif;
+      font-size: .65rem; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; padding: .45rem 1rem;
+      cursor: pointer; transition: all .2s; border-radius: 2px;
+      white-space: nowrap; display: flex; align-items: center; gap: .4rem;
+    }
+    .cat-btn:hover, .cat-btn.active {
+      background: var(--ember); border-color: var(--ember);
+      color: var(--smoke);
+    }
+ 
+    /* ─── MAIN CONTENT ─── */
+    .carta-wrap {
+      max-width: 1300px; margin: 0 auto;
+      padding: 4rem 4rem 6rem;
+    }
+ 
+    /* ─── CATEGORY SECTION ─── */
+    .cat-section {
+      margin-bottom: 5rem;
+      scroll-margin-top: 130px;
+    }
+    .cat-title-row {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin-bottom: 2.5rem; padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(92,51,23,.25);
+    }
+    .cat-icon { font-size: 2rem; }
+    .cat-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 900; color: var(--oak);
+    }
+    .cat-title span { color: var(--ember); font-style: italic; }
+    .cat-count {
+      margin-left: auto;
+      font-size: .65rem; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--ash);
+      background: var(--smoke); padding: .3rem .8rem; border-radius: 2px;
+    }
+ 
+    /* ─── DISH GRID ─── */
+    .dish-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+ 
+    /* ─── DISH CARD ─── */
+    .dish-card {
+      background: white;
+      border: 1px solid rgba(92,51,23,.12);
+      border-radius: 4px; overflow: hidden;
+      cursor: pointer;
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+    }
+    .dish-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(59,36,16,.15);
+      border-color: rgba(192,57,43,.3);
+    }
+    .dish-card-img {
+      width: 100%; aspect-ratio: 4/3;
+      background: linear-gradient(135deg, var(--bark) 0%, var(--oak) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; position: relative; overflow: hidden;
+    }
+    .dish-card-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .4s;
+    }
+    .dish-card:hover .dish-card-img img { transform: scale(1.05); }
+    .dish-badge {
+      position: absolute; top: .8rem; left: .8rem;
+      background: var(--ember); color: var(--smoke);
+      font-size: .55rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; padding: .25rem .6rem; border-radius: 2px;
+    }
+    .dish-badge.gold { background: var(--gold); color: var(--oak); }
+    .dish-badge.green { background: #4a7c59; }
+ 
+    .dish-card-body {
+      padding: 1.2rem 1.4rem;
+      flex: 1; display: flex; flex-direction: column;
+    }
+    .dish-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--oak); margin-bottom: .35rem;
+      line-height: 1.25;
+    }
+    .dish-note {
+      font-size: .75rem; color: var(--ash);
+      font-style: italic; line-height: 1.5;
+      flex: 1; margin-bottom: .8rem;
+    }
+    .dish-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: auto;
+    }
+    .dish-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 900; color: var(--ember);
+    }
+    .dish-arrow {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--smoke); display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; color: var(--ash);
+      transition: background .2s, color .2s;
+    }
+    .dish-card:hover .dish-arrow {
+      background: var(--ember); color: var(--smoke);
+    }
+ 
+    /* ─── SAUCES — compact list ─── */
+    .sauce-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: .8rem;
+    }
+    .sauce-item {
+      background: white;
+      border: 1px solid rgba(92,51,23,.12);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .sauce-item:hover {
+      border-color: rgba(192,57,43,.3);
+      box-shadow: 0 4px 12px rgba(59,36,16,.08);
+    }
+    .sauce-name {
+      font-size: .85rem; font-weight: 600; color: var(--oak);
+    }
+    .sauce-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 900; color: var(--ember);
+      white-space: nowrap;
+    }
+ 
+    /* ─── ALLERGEN NOTE ─── */
+    .allergen-note {
+      background: var(--smoke);
+      border-left: 3px solid var(--gold);
+      padding: 1.2rem 1.5rem;
+      border-radius: 0 4px 4px 0;
+      margin-top: 3rem;
+      font-size: .8rem; line-height: 1.6; color: var(--bark);
+    }
+    .allergen-note strong { color: var(--oak); }
+ 
+    /* ─── BACK LINK ─── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .7rem; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--ash);
+      text-decoration: none; margin-bottom: 3rem;
+      transition: color .2s;
+    }
+    .back-link:hover { color: var(--ember); }
+ 
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .cat-nav { padding: .8rem 1.5rem; top: 58px; }
+      .carta-wrap { padding: 3rem 1.5rem 5rem; }
+      .page-header { padding: 6rem 2rem 3rem; }
+    }
+    @media (max-width: 600px) {
+      .dish-grid { grid-template-columns: 1fr 1fr; gap: .8rem; }
+      .dish-card-body { padding: .9rem 1rem; }
+      .dish-name { font-size: .9rem; }
+    }
+    @media (max-width: 420px) {
+      .dish-grid { grid-template-columns: 1fr; }
+    }
+ 
+    /* ─── LANG ─── */
+    [data-lang] { display: none; }
+    .lang-ca [data-lang="ca"],
+    .lang-es [data-lang="es"],
+    .lang-en [data-lang="en"] { display: inherit; }
+    .lang-ca .nav-links [data-lang="ca"],
+    .lang-es .nav-links [data-lang="es"],
+    .lang-en .nav-links [data-lang="en"] { display: flex; }
+    .lang-ca .dish-grid [data-lang="ca"],
+    .lang-es .dish-grid [data-lang="es"],
+    .lang-en .dish-grid [data-lang="en"],
+    .lang-ca .sauce-list [data-lang="ca"],
+    .lang-es .sauce-list [data-lang="es"],
+    .lang-en .sauce-list [data-lang="en"] { display: grid; }
+    .lang-ca .cat-section[data-lang="ca"],
+    .lang-es .cat-section[data-lang="es"],
+    .lang-en .cat-section[data-lang="en"] { display: block; }
+    .cat-section { display: none; }
+ 
+    /* animations */
+    .dish-card { animation: fadeUp .4s both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="lang-ca">
+ 
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="index.html" class="nav-logo">Fet a la <span>Llenya</span></a>
+  <ul class="nav-links">
+    <li data-lang="ca"><a href="index.html">Inici</a></li>
+    <li data-lang="ca"><a href="carta.html" class="active">La Carta</a></li>
+    <li data-lang="ca"><a href="index.html#contacte">Contacte</a></li>
+    <li data-lang="es"><a href="index.html">Inicio</a></li>
+    <li data-lang="es"><a href="carta.html" class="active">La Carta</a></li>
+    <li data-lang="es"><a href="index.html#contacte">Contacto</a></li>
+    <li data-lang="en"><a href="index.html">Home</a></li>
+    <li data-lang="en"><a href="carta.html" class="active">Menu</a></li>
+    <li data-lang="en"><a href="index.html#contacte">Contact</a></li>
+  </ul>
+  <div class="lang-switcher">
+    <button onclick="setLang('ca')" data-lbtn="ca">CA</button>
+    <button onclick="setLang('es')" data-lbtn="es">ES</button>
+    <button onclick="setLang('en')" data-lbtn="en">EN</button>
+  </div>
+</nav>
+ 
+<!-- ─── PAGE HEADER ─── -->
+<header class="page-header">
+  <p class="page-header-eyebrow">🔥 Fet a la Llenya</p>
+  <h1>
+    <span data-lang="ca">La Carta</span>
+    <span data-lang="es">La Carta</span>
+    <span data-lang="en">Our Menu</span>
+  </h1>
+  <p>
+    <span data-lang="ca">Cuina de mercat, feta avui. Tot natural, tot ecològic, sense additius.</span>
+    <span data-lang="es">Cocina de mercado, hecha hoy. Todo natural, todo ecológico, sin aditivos.</span>
+    <span data-lang="en">Market cuisine, made today. All natural, all organic, no additives.</span>
+  </p>
+</header>
+ 
+<!-- ─── STICKY CAT NAV ─── -->
+<nav class="cat-nav" id="cat-nav">
+  <button class="cat-btn active" onclick="scrollTo('pollos')">
+    🔥 <span data-lang="ca">Pollos a la Llenya</span><span data-lang="es">Pollos a la Leña</span><span data-lang="en">Wood-fired Chicken</span>
+  </button>
+  <button class="cat-btn" onclick="scrollTo('carnes')">
+    🥩 <span data-lang="ca">Carns a la Llenya</span><span data-lang="es">Carnes a la Leña</span><span data-lang="en">Wood-fired Meats</span>
+  </button>
+  <button class="cat-btn" onclick="scrollTo('verduras')">
+    🥦 <span data-lang="ca">Verdures a la Llenya</span><span data-lang="es">Verduras a la Leña</span><span data-lang="en">Wood-fired Veg</span>
+  </button>
+  <button class="cat-btn" onclick="scrollTo('takeaway')">
+    🛍️ <span data-lang="ca">Per Emportar</span><span data-lang="es">Para Llevar</span><span data-lang="en">Takeaway</span>
+  </button>
+  <button class="cat-btn" onclick="scrollTo('croquetes')">
+    🥔 <span data-lang="ca">Croquetes i Patates</span><span data-lang="es">Croquetas y Patatas</span><span data-lang="en">Croquettes & Potatoes</span>
+  </button>
+  <button class="cat-btn" onclick="scrollTo('salses')">
+    🫙 <span data-lang="ca">Salses</span><span data-lang="es">Salsas</span><span data-lang="en">Sauces</span>
+  </button>
+</nav>
+ 
+<!-- ─── CARTA CONTENT ─── -->
+<main class="carta-wrap">
+  <a href="index.html" class="back-link">← <span data-lang="ca">Tornar a l'inici</span><span data-lang="es">Volver al inicio</span><span data-lang="en">Back to home</span></a>
+ 
+  <!-- ══════════════════════════════════
+       POLLOS A LA LLENYA
+  ══════════════════════════════════ -->
+  <section class="cat-section lang-ca" data-lang="ca" id="pollos">
+    <div class="cat-title-row">
+      <span class="cat-icon">🔥</span>
+      <h2 class="cat-title">Pollos a la <span>Llenya</span></h2>
+      <span class="cat-count">2 plats</span>
+    </div>
+    <div class="dish-grid" data-lang="ca">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍗<span class="dish-badge gold">Estrella</span></div>
+        <div class="dish-card-body">
+          <div class="dish-name">Pollastre Rostit a la Llenya</div>
+          <p class="dish-note">Fet amb llenya d'alzina. Pollastre sencer de pagès ecològic.</p>
+          <div class="dish-footer"><span class="dish-price">17,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍗</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Mig Pollastre a la Llenya</div>
+          <p class="dish-note">Fet amb llenya d'alzina. Ideal per a una persona.</p>
+          <div class="dish-footer"><span class="dish-price">9,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-es" data-lang="es" id="pollos">
+    <div class="cat-title-row">
+      <span class="cat-icon">🔥</span>
+      <h2 class="cat-title">Pollos a la <span>Leña</span></h2>
+      <span class="cat-count">2 platos</span>
+    </div>
+    <div class="dish-grid" data-lang="es">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍗<span class="dish-badge gold">Estrella</span></div>
+        <div class="dish-card-body">
+          <div class="dish-name">Pollo Asado a la Leña</div>
+          <p class="dish-note">Hecho con leña de encina. Pollo entero de granja ecológico.</p>
+          <div class="dish-footer"><span class="dish-price">17,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍗</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Medio Pollo a la Leña</div>
+          <p class="dish-note">Hecho con leña de encina. Ideal para una persona.</p>
+          <div class="dish-footer"><span class="dish-price">9,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-en" data-lang="en" id="pollos">
+    <div class="cat-title-row">
+      <span class="cat-icon">🔥</span>
+      <h2 class="cat-title">Wood-fired <span>Chicken</span></h2>
+      <span class="cat-count">2 dishes</span>
+    </div>
+    <div class="dish-grid" data-lang="en">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍗<span class="dish-badge gold">Star dish</span></div>
+        <div class="dish-card-body">
+          <div class="dish-name">Whole Wood-fired Chicken</div>
+          <p class="dish-note">Cooked over holm oak wood. Whole organic free-range chicken.</p>
+          <div class="dish-footer"><span class="dish-price">17,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍗</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Half Wood-fired Chicken</div>
+          <p class="dish-note">Cooked over holm oak wood. Perfect for one person.</p>
+          <div class="dish-footer"><span class="dish-price">9,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <!-- ══════════════════════════════════
+       CARNS A LA LLENYA
+  ══════════════════════════════════ -->
+  <section class="cat-section lang-ca" data-lang="ca" id="carnes">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥩</span>
+      <h2 class="cat-title">Carns a la <span>Llenya</span></h2>
+      <span class="cat-count">3 plats</span>
+    </div>
+    <div class="dish-grid" data-lang="ca">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🥩</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Galta de Porc al Forn de Llenya</div>
+          <p class="dish-note">Feta a la llenya. Carn tendra cuinada a foc lent.</p>
+          <div class="dish-footer"><span class="dish-price">9,00 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍖</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Peus de Porc a la Catalana</div>
+          <p class="dish-note">A la catalana, amb panses, prunes i pinyons.</p>
+          <div class="dish-footer"><span class="dish-price">6,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🌭</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Botifarra de Pagès</div>
+          <p class="dish-note">Feta a la llenya. Botifarra artesana de pagès.</p>
+          <div class="dish-footer"><span class="dish-price">5,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-es" data-lang="es" id="carnes">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥩</span>
+      <h2 class="cat-title">Carnes a la <span>Leña</span></h2>
+      <span class="cat-count">3 platos</span>
+    </div>
+    <div class="dish-grid" data-lang="es">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🥩</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Galta de Cerdo al Horno de Leña</div>
+          <p class="dish-note">Hecho a la leña. Carne tierna cocinada a fuego lento.</p>
+          <div class="dish-footer"><span class="dish-price">9,00 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍖</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Pies de Cerdo a la Catalana</div>
+          <p class="dish-note">A la catalana, con pasas, ciruelas y piñones.</p>
+          <div class="dish-footer"><span class="dish-price">6,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🌭</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Butifarra de Pagès</div>
+          <p class="dish-note">Hecho a la leña. Butifarra artesana de granja.</p>
+          <div class="dish-footer"><span class="dish-price">5,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-en" data-lang="en" id="carnes">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥩</span>
+      <h2 class="cat-title">Wood-fired <span>Meats</span></h2>
+      <span class="cat-count">3 dishes</span>
+    </div>
+    <div class="dish-grid" data-lang="en">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🥩</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Wood-fired Pork Cheek</div>
+          <p class="dish-note">Cooked in the wood-fired oven. Tender slow-cooked meat.</p>
+          <div class="dish-footer"><span class="dish-price">9,00 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍖</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Pork Trotters Catalan Style</div>
+          <p class="dish-note">Catalan style with raisins, plums and pine nuts.</p>
+          <div class="dish-footer"><span class="dish-price">6,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🌭</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Artisan Butifarra Sausage</div>
+          <p class="dish-note">Wood-fired. Traditional Catalan farm sausage.</p>
+          <div class="dish-footer"><span class="dish-price">5,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <!-- ══════════════════════════════════
+       VERDURES A LA LLENYA
+  ══════════════════════════════════ -->
+  <section class="cat-section lang-ca" data-lang="ca" id="verduras">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥦</span>
+      <h2 class="cat-title">Verdures a la <span>Llenya</span></h2>
+      <span class="cat-count">4 plats</span>
+    </div>
+    <div class="dish-grid" data-lang="ca">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🫑</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Escalivada a la Llenya (500 g)</div>
+          <p class="dish-note">Pebrots i albergínia rostits a la llenya. Autèntic sabor de brasa.</p>
+          <div class="dish-footer"><span class="dish-price">16,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍆</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Albergínia al Forn de Llenya (500 g)</div>
+          <p class="dish-note">Albergínia ecològica cuita al forn de llenya.</p>
+          <div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🥒</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Carbassó al Forn de Llenya (500 g)</div>
+          <p class="dish-note">Carbassó ecològic de temporada, cuit a la llenya.</p>
+          <div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🌿<span class="dish-badge green">Temporada</span></div>
+        <div class="dish-card-body">
+          <div class="dish-name">Carxofes al Forn de Llenya</div>
+          <p class="dish-note">De temporada. Carxofes ecològiques rostides a la llenya.</p>
+          <div class="dish-footer"><span class="dish-price">2,50 € / ut</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-es" data-lang="es" id="verduras">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥦</span>
+      <h2 class="cat-title">Verduras a la <span>Leña</span></h2>
+      <span class="cat-count">4 platos</span>
+    </div>
+    <div class="dish-grid" data-lang="es">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🫑</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Escalivada a la Leña (500 g)</div>
+          <p class="dish-note">Pimientos y berenjena asados a la leña. Auténtico sabor de brasa.</p>
+          <div class="dish-footer"><span class="dish-price">16,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍆</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Berenjena al Horno de Leña (500 g)</div>
+          <p class="dish-note">Berenjena ecológica cocida en el horno de leña.</p>
+          <div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🥒</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Calabacín al Horno de Leña (500 g)</div>
+          <p class="dish-note">Calabacín ecológico de temporada, cocinado a la leña.</p>
+          <div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🌿<span class="dish-badge green">Temporada</span></div>
+        <div class="dish-card-body">
+          <div class="dish-name">Alcachofas al Horno de Leña</div>
+          <p class="dish-note">Por temporada. Alcachofas ecológicas asadas a la leña.</p>
+          <div class="dish-footer"><span class="dish-price">2,50 € / ud</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-en" data-lang="en" id="verduras">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥦</span>
+      <h2 class="cat-title">Wood-fired <span>Vegetables</span></h2>
+      <span class="cat-count">4 dishes</span>
+    </div>
+    <div class="dish-grid" data-lang="en">
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🫑</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Escalivada — Wood-fired (500 g)</div>
+          <p class="dish-note">Roasted peppers and aubergine. Authentic wood-fire flavour.</p>
+          <div class="dish-footer"><span class="dish-price">16,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🍆</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Wood-fired Aubergine (500 g)</div>
+          <p class="dish-note">Organic aubergine cooked in the wood-fired oven.</p>
+          <div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🥒</div>
+        <div class="dish-card-body">
+          <div class="dish-name">Wood-fired Courgette (500 g)</div>
+          <p class="dish-note">Seasonal organic courgette, cooked over wood fire.</p>
+          <div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+      <a href="plat.html" class="dish-card">
+        <div class="dish-card-img">🌿<span class="dish-badge green">Seasonal</span></div>
+        <div class="dish-card-body">
+          <div class="dish-name">Wood-fired Artichokes</div>
+          <p class="dish-note">Seasonal only. Organic artichokes roasted over wood fire.</p>
+          <div class="dish-footer"><span class="dish-price">2,50 € / pc</span><span class="dish-arrow">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+ 
+  <!-- ══════════════════════════════════
+       COMIDA PARA LLEVAR
+  ══════════════════════════════════ -->
+  <section class="cat-section lang-ca" data-lang="ca" id="takeaway">
+    <div class="cat-title-row">
+      <span class="cat-icon">🛍️</span>
+      <h2 class="cat-title">Cuina <span>Casolana</span></h2>
+      <span class="cat-count">20 plats</span>
+    </div>
+    <div class="dish-grid" data-lang="ca">
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🐌</div><div class="dish-card-body"><div class="dish-name">Cargols amb Salsa (500 g)</div><p class="dish-note">Per 2 persones.</p><div class="dish-footer"><span class="dish-price">15,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍗</div><div class="dish-card-body"><div class="dish-name">Aletes de Pollastre (500 g)</div><p class="dish-note">Cuinades a la llenya, cruixents i saboroses.</p><div class="dish-footer"><span class="dish-price">13,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Amanida Russa (500 g)</div><p class="dish-note">Per a 2 persones. Recepta casolana.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Amanida Grega (500 g)</div><p class="dish-note">Fresca i natural, amb formatge feta.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍜</div><div class="dish-card-body"><div class="dish-name">Fideuà (500 g)</div><p class="dish-note">Fideuà casolana, recepta tradicional.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🌾</div><div class="dish-card-body"><div class="dish-name">Quinoa amb Verdures (500 g)</div><p class="dish-note">Quinoa ecològica amb verdures de temporada.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Mandonguilles a la Jardinera (500 g)</div><p class="dish-note">Mandonguilles casolanes amb verdures.</p><div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Amanida Alemanya (500 g)</div><p class="dish-note">Amanida de patata a l'estil alemany.</p><div class="dish-footer"><span class="dish-price">12,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Macarrons a la Bolonyesa (500 g)</div><p class="dish-note">Pasta casolana amb salsa bolonyesa.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥬</div><div class="dish-card-body"><div class="dish-name">Espinacs a la Catalana (500 g)</div><p class="dish-note">Amb panses i pinyons. Recepta tradicional.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫛</div><div class="dish-card-body"><div class="dish-name">Pèsols Saltejats amb Pernil (500 g)</div><p class="dish-note">Pèsols ecològics saltejats amb pernil ibèric.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫘</div><div class="dish-card-body"><div class="dish-name">Faves a la Catalana (500 g)</div><p class="dish-note">Amb botifarra i herbes aromàtiques.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Amanida de Llenties (500 g)</div><p class="dish-note">Llenties ecològiques amb verdures fresques.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍄</div><div class="dish-card-body"><div class="dish-name">Mandonguilles amb Bolets (500 g)</div><p class="dish-note">Mandonguilles casolanes amb bolets de temporada.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Amanida de Pasta (500 g)</div><p class="dish-note">Pasta fresca amb verdures i vinagreta.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫕</div><div class="dish-card-body"><div class="dish-name">Canelons de l'Àvia (6 ut.)</div><p class="dish-note">Recepta tradicional de la casa, amb beixamel casolana.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫘</div><div class="dish-card-body"><div class="dish-name">Llenties Estofades amb Verdures (500 g)</div><p class="dish-note">Plat de cullera tradicional i reconfortant.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍆</div><div class="dish-card-body"><div class="dish-name">Albergínia Farcida</div><p class="dish-note">Farcida de bolonyesa i pollastre.</p><div class="dish-footer"><span class="dish-price">6,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥚</div><div class="dish-card-body"><div class="dish-name">Pinxo de Truita de Patata i Ceba</div><p class="dish-note">1 pinxo d'aprox. 500 g. Truita casolana.</p><div class="dish-footer"><span class="dish-price">6,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥪</div><div class="dish-card-body"><div class="dish-name">Llibret de Llom</div><p class="dish-note">Amb pernil dolç i formatge.</p><div class="dish-footer"><span class="dish-price">5,00 €</span><span class="dish-arrow">→</span></div></div></a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-es" data-lang="es" id="takeaway">
+    <div class="cat-title-row">
+      <span class="cat-icon">🛍️</span>
+      <h2 class="cat-title">Cocina <span>Casera</span></h2>
+      <span class="cat-count">20 platos</span>
+    </div>
+    <div class="dish-grid" data-lang="es">
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🐌</div><div class="dish-card-body"><div class="dish-name">Caracoles con Salsa (500 g)</div><p class="dish-note">Para 2 personas.</p><div class="dish-footer"><span class="dish-price">15,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍗</div><div class="dish-card-body"><div class="dish-name">Alitas de Pollo (500 g)</div><p class="dish-note">Cocinadas a la leña, crujientes y sabrosas.</p><div class="dish-footer"><span class="dish-price">13,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Ensaladilla Rusa (500 g)</div><p class="dish-note">Para 2 personas. Receta casera.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Ensalada Griega (500 g)</div><p class="dish-note">Fresca y natural, con queso feta.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍜</div><div class="dish-card-body"><div class="dish-name">Fideuá (500 g)</div><p class="dish-note">Fideuá casera, receta tradicional.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🌾</div><div class="dish-card-body"><div class="dish-name">Quinoa con Verduras (500 g)</div><p class="dish-note">Quinoa ecológica con verduras de temporada.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Albóndigas a la Jardinera (500 g)</div><p class="dish-note">Albóndigas caseras con verduras.</p><div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Ensalada Alemana (500 g)</div><p class="dish-note">Ensalada de patata al estilo alemán.</p><div class="dish-footer"><span class="dish-price">12,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Macarrones a la Boloñesa (500 g)</div><p class="dish-note">Pasta casera con salsa boloñesa.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥬</div><div class="dish-card-body"><div class="dish-name">Espinacas a la Catalana (500 g)</div><p class="dish-note">Con pasas y piñones. Receta tradicional.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫛</div><div class="dish-card-body"><div class="dish-name">Guisantes Salteados con Jamón (500 g)</div><p class="dish-note">Guisantes ecológicos salteados con jamón ibérico.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫘</div><div class="dish-card-body"><div class="dish-name">Habas a la Catalana (500 g)</div><p class="dish-note">Con butifarra y hierbas aromáticas.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Ensalada de Lentejas (500 g)</div><p class="dish-note">Lentejas ecológicas con verduras frescas.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍄</div><div class="dish-card-body"><div class="dish-name">Albóndigas con Setas (500 g)</div><p class="dish-note">Albóndigas caseras con setas de temporada.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Ensalada de Pasta (500 g)</div><p class="dish-note">Pasta fresca con verduras y vinagreta.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫕</div><div class="dish-card-body"><div class="dish-name">Canelones de la Abuela (6 ud.)</div><p class="dish-note">Receta tradicional de la casa, con bechamel casera.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫘</div><div class="dish-card-body"><div class="dish-name">Lentejas Estofadas con Verduras (500 g)</div><p class="dish-note">Plato de cuchara tradicional y reconfortante.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍆</div><div class="dish-card-body"><div class="dish-name">Berenjena Rellena</div><p class="dish-note">Rellena de boloñesa y pollo.</p><div class="dish-footer"><span class="dish-price">6,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥚</div><div class="dish-card-body"><div class="dish-name">Pincho de Tortilla de Patata y Cebolla</div><p class="dish-note">1 pincho de aprox. 500 g. Tortilla casera.</p><div class="dish-footer"><span class="dish-price">6,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥪</div><div class="dish-card-body"><div class="dish-name">Librito de Lomo</div><p class="dish-note">Con jamón dulce y queso.</p><div class="dish-footer"><span class="dish-price">5,00 €</span><span class="dish-arrow">→</span></div></div></a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-en" data-lang="en" id="takeaway">
+    <div class="cat-title-row">
+      <span class="cat-icon">🛍️</span>
+      <h2 class="cat-title">Home-style <span>Kitchen</span></h2>
+      <span class="cat-count">20 dishes</span>
+    </div>
+    <div class="dish-grid" data-lang="en">
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🐌</div><div class="dish-card-body"><div class="dish-name">Snails in Sauce (500 g)</div><p class="dish-note">Serves 2.</p><div class="dish-footer"><span class="dish-price">15,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍗</div><div class="dish-card-body"><div class="dish-name">Chicken Wings (500 g)</div><p class="dish-note">Wood-fired, crispy and flavourful.</p><div class="dish-footer"><span class="dish-price">13,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Russian Salad (500 g)</div><p class="dish-note">Serves 2. Home-made recipe.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Greek Salad (500 g)</div><p class="dish-note">Fresh and natural, with feta cheese.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍜</div><div class="dish-card-body"><div class="dish-name">Fideuà (500 g)</div><p class="dish-note">Traditional home-made Catalan noodle dish.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🌾</div><div class="dish-card-body"><div class="dish-name">Quinoa with Vegetables (500 g)</div><p class="dish-note">Organic quinoa with seasonal vegetables.</p><div class="dish-footer"><span class="dish-price">13,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Meatballs Jardinière (500 g)</div><p class="dish-note">Home-made meatballs with garden vegetables.</p><div class="dish-footer"><span class="dish-price">12,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">German Potato Salad (500 g)</div><p class="dish-note">Potato salad in the German style.</p><div class="dish-footer"><span class="dish-price">12,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Bolognese Pasta (500 g)</div><p class="dish-note">Home-made pasta with bolognese sauce.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥬</div><div class="dish-card-body"><div class="dish-name">Spinach Catalan Style (500 g)</div><p class="dish-note">With raisins and pine nuts. Traditional recipe.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫛</div><div class="dish-card-body"><div class="dish-name">Peas Sautéed with Ham (500 g)</div><p class="dish-note">Organic peas sautéed with Iberian ham.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫘</div><div class="dish-card-body"><div class="dish-name">Broad Beans Catalan Style (500 g)</div><p class="dish-note">With butifarra sausage and aromatic herbs.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥗</div><div class="dish-card-body"><div class="dish-name">Lentil Salad (500 g)</div><p class="dish-note">Organic lentils with fresh vegetables.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍄</div><div class="dish-card-body"><div class="dish-name">Meatballs with Mushrooms (500 g)</div><p class="dish-note">Home-made meatballs with seasonal mushrooms.</p><div class="dish-footer"><span class="dish-price">11,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍝</div><div class="dish-card-body"><div class="dish-name">Pasta Salad (500 g)</div><p class="dish-note">Fresh pasta with vegetables and vinaigrette.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫕</div><div class="dish-card-body"><div class="dish-name">Grandma's Cannelloni (6 pcs.)</div><p class="dish-note">Traditional house recipe with home-made béchamel.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫘</div><div class="dish-card-body"><div class="dish-name">Stewed Lentils with Vegetables (500 g)</div><p class="dish-note">Traditional comforting stew.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍆</div><div class="dish-card-body"><div class="dish-name">Stuffed Aubergine</div><p class="dish-note">Stuffed with bolognese and chicken.</p><div class="dish-footer"><span class="dish-price">6,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥚</div><div class="dish-card-body"><div class="dish-name">Spanish Omelette Slice</div><p class="dish-note">1 slice approx. 500 g. Home-made with onion.</p><div class="dish-footer"><span class="dish-price">6,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥪</div><div class="dish-card-body"><div class="dish-name">Pork Loin Sandwich</div><p class="dish-note">With cooked ham and cheese.</p><div class="dish-footer"><span class="dish-price">5,00 €</span><span class="dish-arrow">→</span></div></div></a>
+    </div>
+  </section>
+ 
+  <!-- ══════════════════════════════════
+       CROQUETES I PATATES
+  ══════════════════════════════════ -->
+  <section class="cat-section lang-ca" data-lang="ca" id="croquetes">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥔</span>
+      <h2 class="cat-title">Croquetes i <span>Patates</span></h2>
+      <span class="cat-count">9 plats</span>
+    </div>
+    <div class="dish-grid" data-lang="ca">
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥔</div><div class="dish-card-body"><div class="dish-name">Patates amb Allioli (500 g)</div><p class="dish-note">Patates ecològiques amb allioli casolà.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍄</div><div class="dish-card-body"><div class="dish-name">Croquetes de Bolets (6 ut.)</div><p class="dish-note">Croquetes artesanes de bolets de temporada.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫕</div><div class="dish-card-body"><div class="dish-name">Croquetes de l'Àvia (6 ut.)</div><p class="dish-note">La recepta tradicional de tota la vida.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥩</div><div class="dish-card-body"><div class="dish-name">Croquetes de Pernil Ibèric (6 ut.)</div><p class="dish-note">Amb pernil ibèric de qualitat.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥬</div><div class="dish-card-body"><div class="dish-name">Croquetes d'Espinacs i Pernil Ibèric (6 ut.)</div><p class="dish-note">Espinacs amb panses, pinyons i pernil ibèric.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥔</div><div class="dish-card-body"><div class="dish-name">Patates Braves</div><p class="dish-note">Patates cruixents amb salsa brava casolana.</p><div class="dish-footer"><span class="dish-price">5,80 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍟</div><div class="dish-card-body"><div class="dish-name">Patates Fregides</div><p class="dish-note">Patates ecològiques fregides al moment.</p><div class="dish-footer"><span class="dish-price">5,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🔥</div><div class="dish-card-body"><div class="dish-name">Patates al Caliu, unitat</div><p class="dish-note">Cuites a les brases. Per unitat.</p><div class="dish-footer"><span class="dish-price">1,80 € / ut</span><span class="dish-arrow">→</span></div></div></a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-es" data-lang="es" id="croquetes">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥔</span>
+      <h2 class="cat-title">Croquetas y <span>Patatas</span></h2>
+      <span class="cat-count">9 platos</span>
+    </div>
+    <div class="dish-grid" data-lang="es">
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥔</div><div class="dish-card-body"><div class="dish-name">Patatas con Alioli (500 g)</div><p class="dish-note">Patatas ecológicas con alioli casero.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍄</div><div class="dish-card-body"><div class="dish-name">Croquetas de Setas (6 ud.)</div><p class="dish-note">Croquetas artesanas de setas de temporada.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫕</div><div class="dish-card-body"><div class="dish-name">Croquetas de la Abuela (6 ud.)</div><p class="dish-note">La receta tradicional de toda la vida.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥩</div><div class="dish-card-body"><div class="dish-name">Croquetas de Jamón Ibérico (6 ud.)</div><p class="dish-note">Con jamón ibérico de calidad.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥬</div><div class="dish-card-body"><div class="dish-name">Croquetas de Espinacas y Jamón (6 ud.)</div><p class="dish-note">Espinacas con pasas, piñones y jamón ibérico.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥔</div><div class="dish-card-body"><div class="dish-name">Patatas Bravas</div><p class="dish-note">Patatas crujientes con salsa brava casera.</p><div class="dish-footer"><span class="dish-price">5,80 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍟</div><div class="dish-card-body"><div class="dish-name">Patatas Fritas</div><p class="dish-note">Patatas ecológicas fritas al momento.</p><div class="dish-footer"><span class="dish-price">5,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🔥</div><div class="dish-card-body"><div class="dish-name">Patatas al Caliu, unidad</div><p class="dish-note">Cocinadas en las brasas. Por unidad.</p><div class="dish-footer"><span class="dish-price">1,80 € / ud</span><span class="dish-arrow">→</span></div></div></a>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-en" data-lang="en" id="croquetes">
+    <div class="cat-title-row">
+      <span class="cat-icon">🥔</span>
+      <h2 class="cat-title">Croquettes <span>&amp; Potatoes</span></h2>
+      <span class="cat-count">9 dishes</span>
+    </div>
+    <div class="dish-grid" data-lang="en">
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥔</div><div class="dish-card-body"><div class="dish-name">Potatoes with Aioli (500 g)</div><p class="dish-note">Organic potatoes with home-made aioli.</p><div class="dish-footer"><span class="dish-price">10,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍄</div><div class="dish-card-body"><div class="dish-name">Mushroom Croquettes (6 pcs.)</div><p class="dish-note">Artisan croquettes with seasonal mushrooms.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🫕</div><div class="dish-card-body"><div class="dish-name">Grandma's Croquettes (6 pcs.)</div><p class="dish-note">The traditional house recipe.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥩</div><div class="dish-card-body"><div class="dish-name">Iberian Ham Croquettes (6 pcs.)</div><p class="dish-note">Made with quality Iberian ham.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥬</div><div class="dish-card-body"><div class="dish-name">Spinach &amp; Ham Croquettes (6 pcs.)</div><p class="dish-note">Spinach with raisins, pine nuts and Iberian ham.</p><div class="dish-footer"><span class="dish-price">8,00 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🥔</div><div class="dish-card-body"><div class="dish-name">Patatas Bravas</div><p class="dish-note">Crispy potatoes with home-made spicy sauce.</p><div class="dish-footer"><span class="dish-price">5,80 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🍟</div><div class="dish-card-body"><div class="dish-name">French Fries</div><p class="dish-note">Organic potatoes, fried fresh.</p><div class="dish-footer"><span class="dish-price">5,50 €</span><span class="dish-arrow">→</span></div></div></a>
+      <a href="plat.html" class="dish-card"><div class="dish-card-img">🔥</div><div class="dish-card-body"><div class="dish-name">Ember-roasted Potatoes</div><p class="dish-note">Cooked in the embers. Per unit.</p><div class="dish-footer"><span class="dish-price">1,80 € / pc</span><span class="dish-arrow">→</span></div></div></a>
+    </div>
+  </section>
+ 
+  <!-- ══════════════════════════════════
+       SALSES
+  ══════════════════════════════════ -->
+  <section class="cat-section lang-ca" data-lang="ca" id="salses">
+    <div class="cat-title-row">
+      <span class="cat-icon">🫙</span>
+      <h2 class="cat-title"><span>Salses</span></h2>
+      <span class="cat-count">3 salses</span>
+    </div>
+    <div class="sauce-list" data-lang="ca">
+      <div class="sauce-item"><span class="sauce-name">Salsa Brava</span><span class="sauce-price">1,70 €</span></div>
+      <div class="sauce-item"><span class="sauce-name">Allioli</span><span class="sauce-price">1,70 €</span></div>
+      <div class="sauce-item"><span class="sauce-name">Salsa Rosa</span><span class="sauce-price">1,70 €</span></div>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-es" data-lang="es" id="salses">
+    <div class="cat-title-row">
+      <span class="cat-icon">🫙</span>
+      <h2 class="cat-title"><span>Salsas</span></h2>
+      <span class="cat-count">3 salsas</span>
+    </div>
+    <div class="sauce-list" data-lang="es">
+      <div class="sauce-item"><span class="sauce-name">Salsa Brava</span><span class="sauce-price">1,70 €</span></div>
+      <div class="sauce-item"><span class="sauce-name">Alioli</span><span class="sauce-price">1,70 €</span></div>
+      <div class="sauce-item"><span class="sauce-name">Salsa Rosa</span><span class="sauce-price">1,70 €</span></div>
+    </div>
+  </section>
+ 
+  <section class="cat-section lang-en" data-lang="en" id="salses">
+    <div class="cat-title-row">
+      <span class="cat-icon">🫙</span>
+      <h2 class="cat-title"><span>Sauces</span></h2>
+      <span class="cat-count">3 sauces</span>
+    </div>
+    <div class="sauce-list" data-lang="en">
+      <div class="sauce-item"><span class="sauce-name">Spicy Tomato Sauce</span><span class="sauce-price">1,70 €</span></div>
+      <div class="sauce-item"><span class="sauce-name">Aioli</span><span class="sauce-price">1,70 €</span></div>
+      <div class="sauce-item"><span class="sauce-name">Pink Sauce</span><span class="sauce-price">1,70 €</span></div>
+    </div>
+  </section>
+ 
+  <!-- ALLERGEN NOTE -->
+  <div class="allergen-note">
+    <strong data-lang="ca">Al·lèrgens:</strong>
+    <strong data-lang="es">Alérgenos:</strong>
+    <strong data-lang="en">Allergens:</strong>
+    <span data-lang="ca"> Si tens alguna al·lèrgia o intolerància alimentària, consulta'ns directament. Alguns plats poden contenir gluten, lactosa, fruits secs o ous. Cuina en un espai on es manipulen tots els ingredients.</span>
+    <span data-lang="es"> Si tienes alguna alergia o intolerancia alimentaria, consúltanos directamente. Algunos platos pueden contener gluten, lactosa, frutos secos o huevos. Cocina en un espacio donde se manipulan todos los ingredientes.</span>
+    <span data-lang="en"> If you have any food allergies or intolerances, please ask us directly. Some dishes may contain gluten, lactose, nuts or eggs. Prepared in a kitchen where all ingredients are handled.</span>
+  </div>
+</main>
+ 
+<!-- ─── FOOTER ─── -->
+<footer style="background:var(--char);text-align:center;padding:2rem 4rem;border-top:1px solid rgba(237,224,207,.08)">
+  <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;font-style:italic;color:var(--smoke);margin-bottom:.5rem">
+    Fet a la <span style="color:var(--gold)">Llenya</span>
+  </div>
+  <div style="font-size:.65rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--ash)">
+    <span data-lang="ca">Rostisseria Artesana · Barcelona · Tot fet avui</span>
+    <span data-lang="es">Rostissería Artesana · Barcelona · Todo hecho hoy</span>
+    <span data-lang="en">Artisan Rotisserie · Barcelona · All made today</span>
+  </div>
+</footer>
+ 
+<script>
+  // ── Language switcher ──
+  function setLang(lang) {
+    document.body.className = 'lang-' + lang;
+    document.querySelectorAll('[data-lbtn]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lbtn === lang);
+    });
+    document.documentElement.lang = lang;
+  }
+  document.querySelector('[data-lbtn="ca"]').classList.add('active');
+ 
+  // ── Category nav scroll & highlight ──
+  function scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+ 
+  // ── Intersection observer for active cat nav ──
+  const sections = ['pollos','carnes','verduras','takeaway','croquetes','salses'];
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = sections.indexOf(entry.target.id);
+        if (idx >= 0) {
+          document.querySelectorAll('.cat-btn').forEach((btn, i) => {
+            btn.classList.toggle('active', i === idx);
+          });
+        }
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+ 
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+</script>
+</body>
+</html>
